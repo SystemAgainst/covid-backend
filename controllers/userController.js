@@ -6,7 +6,7 @@ class UserController {
         try {
             const { firstName, lastName, email, ticketNumber } = req.body;
 
-            if (!firstName || !lastName || !email || !ticketNumber) {
+            if (!email) {
                 return next(ApiError.badRequest("Обнаружены недостающие данные"));
             }
 
