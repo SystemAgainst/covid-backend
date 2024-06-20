@@ -1,47 +1,29 @@
-const { User, TestResult, Request } = require('../models');
-const multer = require('multer');
-const path = require('path');
+const ApiError = require('../errors/apiError');
+const User = require("../models/user");
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+class UserController {
+    async create(req, res, next) {
+        try {
+            const { firstName, lastName, email, ticketNumber } = req.body;
 
-const upload = multer({ storage });
+            if (!firstName || !lastName || !email || !ticketNumber) {
+                return next(ApiError.badRequest("Обнаружены недостающие данные"));
+            }
 
-exports.registerUser = async (req, res) => {
-    const { firstName, lastName, email, ticketNumber } = req.body;
-    try {
-        const user = await User.create({ firstName, lastName, email, ticketNumber });
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Error registering user' });
+            const user = await User.create({
+                firstName,
+                lastName,
+                email,
+                ticketNumber,
+            });
+
+            return res.status(201).json({ user });
+
+        } catch (error) {
+            console.error(error);
+            return next(ApiError.internal("Непредвиденная ошибка"));
+        }
     }
-};
+}
 
-exports.uploadPDF = upload.single('pdf');
-
-exports.uploadPDFHandler = async (req, res) => {
-    const { userId } = req.body;
-    const pdfPath = req.file.path;
-    try {
-        const testResult = await TestResult.create({ userId, pdfPath });
-        res.status(201).json(testResult);
-    } catch (error) {
-        res.status(500).json({ error: 'Error uploading PDF' });
-    }
-};
-
-exports.requestTest = async (req, res) => {
-    const { userId } = req.body;
-    try {
-        const request = await Request.create({ userId, status: 'pending' });
-        res.status(201).json(request);
-    } catch (error) {
-        res.status(500).json({ error: 'Error requesting test' });
-    }
-};
+module.exports = new UserController();

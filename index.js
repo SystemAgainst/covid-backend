@@ -7,7 +7,6 @@ const errorHandler = require('./middlewares/errorHandlingMiddleware');
 const router = require('./routes/index');
 const path = require('path');
 
-
 const PORT = process.env.PORT || 5050;
 
 const app = express();
@@ -17,6 +16,7 @@ app
     .use(cookieParser())
     .use(express.json())
     .use("/api", router)
+    .use('/uploads', express.static('uploads'))
     .use(errorHandler);
 
 const main = async () => {
