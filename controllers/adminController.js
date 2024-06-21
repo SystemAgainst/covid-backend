@@ -1,8 +1,6 @@
 const ApiError = require('../errors/apiError');
 const User = require("../models/user");
 const Admin = require('../models/admin');
-const path = require('path');
-const fs = require('fs');
 
 class AdminController {
     async getAll(req, res, next) {
