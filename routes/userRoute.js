@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get('/list', controller.getAll);
+// router.get('/list', controller.getAll);
 router.post('/create', controller.create);
 router.patch('/upload/:id', upload.single('pdf'), controller.uploadPDF);
 

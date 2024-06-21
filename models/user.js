@@ -24,6 +24,11 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "Нет теста",
+    },
 });
 
 module.exports = User;
