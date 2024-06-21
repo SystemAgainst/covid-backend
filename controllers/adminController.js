@@ -38,6 +38,33 @@ class AdminController {
         }
     }
 
+    async updateStatus(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { status } = req.body;
+
+            if (!status) {
+                return next(ApiError.badRequest("Статус не указан"));
+            }
+
+            const user = await User.findOne({
+                where: { id },
+            });
+
+            if (!user) {
+                return next(ApiError.badRequest("Не найден пользователь"));
+            }
+
+            user.status = status;
+            await user.save();
+
+            res.status(200).json({ message: "Статус обновлен", user });
+        } catch (e) {
+            console.error(e);
+            return next(ApiError.internal("Непредвиденная ошибка"));
+        }
+    }
+
     async login(req, res, next) {
         try {
             const { email, password } = req.body;

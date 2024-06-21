@@ -4,6 +4,7 @@ const controller = require('../controllers/adminController');
 
 router.get('/list', controller.getAll);
 router.get('/:id', controller.getOne);
+router.patch('/:id', controller.updateStatus);
 router.post('/auth', controller.login);
 
 module.exports = router;
