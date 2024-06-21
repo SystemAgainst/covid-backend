@@ -1,25 +1,22 @@
 const Router = require('express');
+const multer = require('multer');
+const path = require('path');
 const router = new Router();
 const controller = require('../controllers/userController');
-const multer = require('multer');
 
-// Настройка multer для загрузки PDF-файлов
-const upload = multer({
-    dest: 'uploads/', // Папка, куда будут сохраняться файлы
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'application/pdf') {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only PDF files are allowed.'));
-        }
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
     },
-    limits: {
-        fileSize: 1024 * 1024 * 10 // Ограничение на размер файла (10 MB)
-    }
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
 });
+
+const upload = multer({ storage });
 
 router.get('/list', controller.getAll);
 router.post('/create', controller.create);
-router.post('/:id/upload', upload.single('pdf'), controller.uploadPDF);
+router.patch('/upload/:id', upload.single('pdf'), controller.uploadPDF);
 
 module.exports = router;
