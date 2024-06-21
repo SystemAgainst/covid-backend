@@ -20,6 +20,24 @@ class AdminController {
         }
     }
 
+    async getOne(req, res, next) {
+        try {
+            const { id } = req.params;
+
+            const user = await User.findOne({
+                where: { id },
+            });
+
+            if (!user) {
+                return next(ApiError.badRequest("Не найден пользователь"));
+            }
+
+            res.status(201).json(user);
+        } catch (e) {
+            return next(ApiError.internal("Непредвиденная ошибка"));
+        }
+    }
+
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
