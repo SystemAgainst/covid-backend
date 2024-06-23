@@ -20,6 +20,11 @@ const User = sequelize.define('User', {
         allowNull: false,
         unique: true,
     },
+    passportData: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
     pdfPath: {
         type: DataTypes.STRING,
         allowNull: true,

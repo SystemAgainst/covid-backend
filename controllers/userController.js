@@ -4,24 +4,9 @@ const path = require('path');
 const fs = require('fs');
 
 class UserController {
-    async getAll(req, res, next) {
-        try {
-            const userList = await User.findAndCountAll({});
-
-            if (!userList) {
-                return next(ApiError.internal("Нет клиентов"));
-            }
-
-            res.status(201).json(userList);
-        } catch (e) {
-            console.error(e);
-            return next(ApiError.internal("Непредвиденная ошибка"));
-        }
-    }
-
     async create(req, res, next) {
         try {
-            const { firstName, lastName, email, ticketNumber } = req.body;
+            const { firstName, lastName, email, ticketNumber, passportData } = req.body;
 
             if (!email) {
                 return next(ApiError.badRequest("Обнаружены недостающие данные"));
@@ -32,6 +17,7 @@ class UserController {
                 lastName,
                 email,
                 ticketNumber,
+                passportData,
             });
 
             return res.status(201).json({ user });
