@@ -75,17 +75,32 @@ class AdminController {
                 return next(ApiError.badRequest("Неверные данные при авторизации"));
             }
 
-            const existingAdmin = await Admin.findOne({ where: { email } });
-            if (existingAdmin) {
-                return next(ApiError.badRequest("Администратор с таким email уже существует"));
-            }
-
-            const admin = await Admin.create({
-                email,
-                password,
-            });
+            const admin = await Admin.findOne({ where: { email } });
 
             return res.status(201).json({ admin });
+
+        } catch (e) {
+            return next(ApiError.internal("Непредвиденная ошибка"));
+        }
+    }
+
+    async create(req, res, next) {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                return next(ApiError.badRequest("Нет почты или пароля"));
+            }
+
+            const existedUser = await Admin.findOne({ where: { email } });
+
+            if (existedUser) {
+                return next(ApiError.badRequest("Пользователь уже существует"))
+            }
+
+            const user = await Admin.create({ email, password });
+
+            return res.status(201).json({ user });
 
         } catch (e) {
             return next(ApiError.internal("Непредвиденная ошибка"));

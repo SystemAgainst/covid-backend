@@ -6,5 +6,6 @@ router.get('/list', controller.getAll);
 router.get('/:id', controller.getOne);
 router.patch('/:id', controller.updateStatus);
 router.post('/auth', controller.login);
+router.post('/create', controller.create);
 
 module.exports = router;
