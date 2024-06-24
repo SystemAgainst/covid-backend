@@ -7,5 +7,6 @@ router.get('/:id', controller.getOne);
 router.patch('/:id', controller.updateStatus);
 router.post('/auth', controller.login);
 router.post('/create', controller.create);
+router.post('/:id/email', controller.sendEmail);
 
 module.exports = router;

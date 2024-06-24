@@ -1,6 +1,8 @@
 const ApiError = require('../errors/apiError');
 const User = require("../models/user");
 const Admin = require('../models/admin');
+const sendMail = require('../config/nodemailler');
+
 
 class AdminController {
     async getAll(req, res, next) {
@@ -106,7 +108,42 @@ class AdminController {
             return next(ApiError.internal("Непредвиденная ошибка"));
         }
     }
-}
+
+    async sendEmail(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { status } = req.body;
+
+            if (!status) {
+                return next(ApiError.badRequest("Необходимо новый статус"));
+            }
+
+            const user = await User.findOne({ where: { id } });
+
+            if (!user) {
+                return next(ApiError.badRequest("Пользователь не найден"));
+            }
+
+            let mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'Результаты ПЦР-теста',
+                html: `Уважаемый <i>${user.firstName}</i>, хотим сообщить вам результаты вашего ПЦР-теста! Ваш статус - <strong>${status}</strong>`,
+            };
+
+            sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return next(ApiError.internal("Ошибка при отправке письма: ", error));
+                } else {
+                    res.status(200).json({ message: "Письмо успешно отправлено", info });
+                }
+            });
+
+        } catch (e) {
+            console.error(e);
+            return next(ApiError.internal("Непредвиденная ошибка"));
+        }
+    }}
 
 module.exports = new AdminController();
 
