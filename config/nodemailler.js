@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const ApiError = require("../errors/apiError");
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.mail.ru',
