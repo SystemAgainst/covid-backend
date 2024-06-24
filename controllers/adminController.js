@@ -133,7 +133,8 @@ class AdminController {
 
             sendMail(mailOptions, (error, info) => {
                 if (error) {
-                    return next(ApiError.internal("Ошибка при отправке письма: ", error));
+                    console.error('Ошибка при отправке письма: ', error);
+                    return next(ApiError.internal(`Ошибка при отправке письма: ${error.message}`));
                 } else {
                     res.status(200).json({ message: "Письмо успешно отправлено", info });
                 }

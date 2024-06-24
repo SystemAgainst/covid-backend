@@ -27,10 +27,10 @@ transporter.verify((error, success) => {
 const sendMail = (mailOptions, callback) => {
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            return console.log('Error: ', error);
+            console.error('Ошибка при отправке письма: ', error);
+            return callback(error, null);
         }
-        console.log('Message sent: %s', info.messageId);
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        callback(null, info);
     });
 };
 
