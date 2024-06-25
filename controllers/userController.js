@@ -1,15 +1,21 @@
 const ApiError = require('../errors/apiError');
 const User = require("../models/user");
-const path = require('path');
-const fs = require('fs');
 
 class UserController {
     async create(req, res, next) {
         try {
-            const { firstName, lastName, email, ticketNumber, passportData } = req.body;
+            const { firstName, lastName, email, ticketNumber, passportData, flightTime, pcrTestTime } = req.body;
 
-            if (!email) {
+            if (!firstName || !lastName || !email || !ticketNumber || !passportData || !flightTime || !pcrTestTime) {
                 return next(ApiError.badRequest("Обнаружены недостающие данные"));
+            }
+
+            // Валидация времени
+            const flightTimeDate = new Date(flightTime);
+            const pcrTestTimeDate = new Date(pcrTestTime);
+
+            if (flightTimeDate - pcrTestTimeDate < 2 * 60 * 60 * 1000) {
+                return next(ApiError.badRequest("Между временем вылета и сдачей ПЦР-теста должно быть минимум два часа"));
             }
 
             const user = await User.create({
@@ -18,6 +24,8 @@ class UserController {
                 email,
                 ticketNumber,
                 passportData,
+                flightTime: flightTimeDate,
+                pcrTestTime: pcrTestTimeDate,
             });
 
             return res.status(201).json({ user });
@@ -26,38 +34,6 @@ class UserController {
             return next(ApiError.internal("Непредвиденная ошибка"));
         }
     }
-
-    async uploadPDF(req, res, next) {
-        try {
-            const userId = req.params.id;
-            const file = req.file;
-
-            if (!file) {
-                return next(ApiError.badRequest('No file uploaded or invalid file type.'));
-            }
-
-            const user = await User.findByPk(userId);
-
-            if (!user) {
-                return next(ApiError.badRequest('User not found.'));
-            }
-
-            // Ensure the uploads directory exists
-            const uploadDir = path.join(__dirname, '..', 'uploads');
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir);
-            }
-
-            user.pdfPath = path.join('uploads', file.filename);
-            await user.save();
-
-            res.status(201).send('File uploaded successfully.');
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            return next(ApiError.internal('An error occurred while uploading the file.'));
-        }
-    }
 }
 
 module.exports = new UserController();
-

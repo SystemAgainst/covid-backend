@@ -25,14 +25,18 @@ const User = sequelize.define('User', {
         allowNull: false,
         unique: true,
     },
-    pdfPath: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
     status: {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "Нет теста",
+    },
+    flightTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    pcrTestTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
     },
 });
 
